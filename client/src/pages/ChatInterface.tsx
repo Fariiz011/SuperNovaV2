@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { User, ArrowLeft, Mic, Send } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
+import { useVoice } from "@/hooks/useVoice";
 
 interface ChatInterfaceProps {
   onBack: () => void;
@@ -28,6 +29,12 @@ export default function ChatInterface({ onBack, user }: ChatInterfaceProps) {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { sendMessage: sendChatMessage } = useChat();
+  const { 
+    isRecording, 
+    transcript, 
+    startRecording, 
+    stopRecording 
+  } = useVoice(user?.id || 1);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,6 +88,21 @@ export default function ChatInterface({ onBack, user }: ChatInterfaceProps) {
         setMessages(prev => [...prev, errorMessage]);
         setIsTyping(false);
       }, 1000);
+    }
+  };
+
+  const handleVoiceInput = async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      try {
+        await startRecording();
+        if (transcript) {
+          setMessage(transcript);
+        }
+      } catch (error) {
+        console.error("Voice input error:", error);
+      }
     }
   };
 
@@ -165,8 +187,24 @@ export default function ChatInterface({ onBack, user }: ChatInterfaceProps) {
             placeholder="Write your message?" 
             className="flex-1 bg-transparent text-white placeholder-white/60 focus:outline-none px-2"
           />
-          <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-white hover:bg-white/20 transition-all">
+          <button 
+            onClick={handleVoiceInput}
+            className={`w-10 h-10 rounded-full glass flex items-center justify-center text-white hover:bg-white/20 transition-all relative ${
+              isRecording ? 'bg-red-500/50' : ''
+            }`}
+          >
             <Mic size={16} />
+            {isRecording && (
+              <div className="absolute inset-0 rounded-full voice-pulse">
+                <div className="voice-bars absolute inset-0 flex items-center justify-center">
+                  <div className="voice-bar"></div>
+                  <div className="voice-bar"></div>
+                  <div className="voice-bar"></div>
+                  <div className="voice-bar"></div>
+                  <div className="voice-bar"></div>
+                </div>
+              </div>
+            )}
           </button>
           <button 
             onClick={handleSendMessage}
