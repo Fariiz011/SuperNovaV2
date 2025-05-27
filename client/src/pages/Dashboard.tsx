@@ -6,11 +6,12 @@ import SettingsSidebar from "@/components/SettingsSidebar";
 interface DashboardProps {
   onNavigateToChat: () => void;
   onNavigateToVoice: () => void;
+  onNavigateToImage: () => void;
   onBackToLogin: () => void;
   user?: any;
 }
 
-export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onBackToLogin, user }: DashboardProps) {
+export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onNavigateToImage, onBackToLogin, user }: DashboardProps) {
   const [quickMessage, setQuickMessage] = useState("");
   const [showSettings, setShowSettings] = useState(false);
 

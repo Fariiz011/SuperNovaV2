@@ -63,6 +63,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate image endpoint
+  app.post("/api/generate-image", async (req, res) => {
+    try {
+      const { prompt } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ message: "Prompt is required" });
+      }
+
+      const imageBuffer = await generateImageWithHuggingFace(prompt);
+      
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Disposition', 'inline; filename="generated-image.png"');
+      res.send(imageBuffer);
+    } catch (error) {
+      console.error("Image generation error:", error);
+      res.status(500).json({ message: "Failed to generate image" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
@@ -126,5 +146,62 @@ Jawaban SuperNova:`,
 
     const responses = isIndonesian ? fallbackResponses.indonesian : fallbackResponses.english;
     return responses[Math.floor(Math.random() * responses.length)];
+  }
+}
+
+async function generateImageWithHuggingFace(prompt: string): Promise<Buffer> {
+  const HF_API_KEY = process.env.HUGGINGFACE_API_KEY || process.env.VITE_HUGGINGFACE_API_KEY || "hf_fallback";
+  
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
+      {
+        headers: {
+          "Authorization": `Bearer ${HF_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          inputs: `${prompt}, high quality, detailed, beautiful, masterpiece`,
+          parameters: {
+            negative_prompt: "blurry, low quality, distorted, ugly, bad anatomy",
+            num_inference_steps: 30,
+            guidance_scale: 7.5,
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Hugging Face API error: ${response.status}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    console.error("Hugging Face API error:", error);
+    
+    // Fallback: Generate a simple colored placeholder image
+    const canvas = require('canvas');
+    const canvasInstance = canvas.createCanvas(512, 512);
+    const ctx = canvasInstance.getContext('2d');
+    
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+    gradient.addColorStop(0, '#9333ea');
+    gradient.addColorStop(1, '#3b82f6');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 512);
+    
+    // Add text
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('SuperNova AI', 256, 200);
+    ctx.font = '16px Arial';
+    ctx.fillText('Image generation temporarily unavailable', 256, 280);
+    ctx.fillText('Please try again later', 256, 320);
+    
+    return canvasInstance.toBuffer('image/png');
   }
 }

@@ -9,10 +9,11 @@ import LoginScreen from "@/pages/LoginScreen";
 import Dashboard from "@/pages/Dashboard";
 import ChatInterface from "@/pages/ChatInterface";
 import VoiceInterface from "@/pages/VoiceInterface";
+import ImageGenerator from "@/pages/ImageGenerator";
 import RegisterPopup from "@/components/RegisterPopup";
 import SuccessPopup from "@/components/SuccessPopup";
 
-export type Screen = 'intro' | 'login' | 'dashboard' | 'chat' | 'voice';
+export type Screen = 'intro' | 'login' | 'dashboard' | 'chat' | 'voice' | 'image';
 
 function Router() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('intro');
@@ -58,6 +59,7 @@ function Router() {
         <Dashboard 
           onNavigateToChat={() => setCurrentScreen('chat')}
           onNavigateToVoice={() => setCurrentScreen('voice')}
+          onNavigateToImage={() => setCurrentScreen('image')}
           onBackToLogin={() => setCurrentScreen('login')}
           user={user}
         />
@@ -72,6 +74,12 @@ function Router() {
         <VoiceInterface 
           onBack={() => setCurrentScreen('dashboard')}
           onNavigateToChat={() => setCurrentScreen('chat')}
+          user={user}
+        />
+      )}
+      {currentScreen === 'image' && (
+        <ImageGenerator 
+          onBack={() => setCurrentScreen('dashboard')}
           user={user}
         />
       )}
