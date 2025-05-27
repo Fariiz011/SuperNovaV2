@@ -249,15 +249,16 @@ export default function SettingsSidebar({ isOpen, onClose, user, onLogout }: Set
             <div className="space-y-4">
               <div className="glass rounded-lg p-4">
                 <h4 className="text-white font-semibold mb-2">Email Support</h4>
-                <p className="text-white/70 text-sm">support@supernova.ai</p>
+                <p className="text-white/70 text-sm">icalhack58@gmail.com</p>
               </div>
               
               <div className="glass rounded-lg p-4">
                 <h4 className="text-white font-semibold mb-2">Media Sosial</h4>
                 <div className="space-y-1 text-white/70 text-sm">
-                  <p>Instagram: @supernova_ai</p>
-                  <p>Twitter: @SuperNovaAI</p>
-                  <p>LinkedIn: SuperNova Indonesia</p>
+                  <p>Instagram: [Masukkan Instagram Anda]</p>
+                  <p>Twitter: [Masukkan Twitter Anda]</p>
+                  <p>LinkedIn: [Masukkan LinkedIn Anda]</p>
+                  <p>YouTube: [Masukkan YouTube Anda]</p>
                 </div>
               </div>
               
