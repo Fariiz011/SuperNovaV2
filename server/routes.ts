@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Prompt is required" });
       }
 
-      const imageBuffer = await generateImageWithHuggingFace(prompt);
+      const imageBuffer = await generateImageWithOpenAI(prompt);
       
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'inline; filename="generated-image.png"');
@@ -81,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Image generation error:", error);
       res.status(500).json({ 
         message: "Failed to generate image", 
-        error: error.message 
+        error: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });
@@ -152,44 +152,54 @@ Jawaban SuperNova:`,
   }
 }
 
-async function generateImageWithHuggingFace(prompt: string): Promise<Buffer> {
-  const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
+async function generateImageWithOpenAI(prompt: string): Promise<Buffer> {
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
   
-  if (!HF_API_KEY || HF_API_KEY === "hf_fallback") {
-    throw new Error("Hugging Face API key not configured");
+  if (!OPENAI_API_KEY) {
+    throw new Error("OpenAI API key not configured");
   }
   
   try {
-    console.log("Generating image with prompt:", prompt);
+    console.log("Generating image with DALL-E 3, prompt:", prompt);
     
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
+      "https://api.openai.com/v1/images/generations",
       {
         headers: {
-          "Authorization": `Bearer ${HF_API_KEY}`,
+          "Authorization": `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         method: "POST",
         body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            width: 512,
-            height: 512
-          }
+          model: "dall-e-3", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard",
+          response_format: "url"
         }),
       }
     );
 
-    console.log("HF Response status:", response.status);
+    console.log("OpenAI Response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log("HF Error response:", errorText);
-      throw new Error(`Hugging Face API error: ${response.status} - ${errorText}`);
+      console.log("OpenAI Error response:", errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    console.log("Image generated successfully, size:", arrayBuffer.byteLength);
+    const data = await response.json();
+    const imageUrl = data.data[0].url;
+    
+    // Download the image from the URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      throw new Error("Failed to download generated image");
+    }
+    
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    console.log("Image generated successfully with DALL-E 3, size:", arrayBuffer.byteLength);
     return Buffer.from(arrayBuffer);
     
   } catch (error) {
