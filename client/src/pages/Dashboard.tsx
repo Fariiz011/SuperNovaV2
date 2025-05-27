@@ -38,9 +38,9 @@ export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onNavig
     },
     {
       icon: Image,
-      title: "Coming soon",
-      action: () => {},
-      active: false
+      title: "Generate Image",
+      action: onNavigateToImage,
+      active: true
     },
     {
       icon: Lightbulb,
