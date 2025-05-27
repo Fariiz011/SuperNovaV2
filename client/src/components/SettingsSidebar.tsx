@@ -253,12 +253,12 @@ export default function SettingsSidebar({ isOpen, onClose, user, onLogout }: Set
               </div>
               
               <div className="glass rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-2">Media Sosial</h4>
+                <h4 className="text-white font-semibold mb-2">Media Sosial & Kontak</h4>
                 <div className="space-y-1 text-white/70 text-sm">
-                  <p>Instagram: [Masukkan Instagram Anda]</p>
-                  <p>Twitter: [Masukkan Twitter Anda]</p>
-                  <p>LinkedIn: [Masukkan LinkedIn Anda]</p>
-                  <p>YouTube: [Masukkan YouTube Anda]</p>
+                  <p>Instagram: @lifevand_</p>
+                  <p>Facebook: Dev Lifevander</p>
+                  <p>WhatsApp: +6287729044780</p>
+                  <p>GitHub: Fariz011</p>
                 </div>
               </div>
               
