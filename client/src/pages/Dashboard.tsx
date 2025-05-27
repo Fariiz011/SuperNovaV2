@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { User, ArrowLeft, MessageCircle, Mic, Image, Lightbulb, Send } from "lucide-react";
+import { User, ArrowLeft, MessageCircle, Mic, Image, Lightbulb, Send, Settings } from "lucide-react";
 import { useState } from "react";
+import SettingsSidebar from "@/components/SettingsSidebar";
 
 interface DashboardProps {
   onNavigateToChat: () => void;
@@ -11,6 +12,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onBackToLogin, user }: DashboardProps) {
   const [quickMessage, setQuickMessage] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleQuickMessage = () => {
     if (quickMessage.trim()) {
@@ -56,8 +58,11 @@ export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onBackT
     >
       {/* Header */}
       <div className="flex items-center justify-between p-6">
-        <button className="w-12 h-12 rounded-full glass flex items-center justify-center text-white">
-          <User size={20} />
+        <button 
+          onClick={() => setShowSettings(true)}
+          className="w-12 h-12 rounded-full glass flex items-center justify-center text-white hover:bg-white/20 transition-all"
+        >
+          <Settings size={20} />
         </button>
         
         <div className="text-center">
@@ -140,6 +145,14 @@ export default function Dashboard({ onNavigateToChat, onNavigateToVoice, onBackT
           </button>
         </motion.div>
       </div>
+
+      {/* Settings Sidebar */}
+      <SettingsSidebar 
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        user={user}
+        onLogout={onBackToLogin}
+      />
     </motion.div>
   );
 }
