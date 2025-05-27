@@ -79,10 +79,14 @@ async function generateCohereResponse(message: string): Promise<string> {
       },
       body: JSON.stringify({
         model: "command",
-        prompt: `You are SuperNova, a helpful AI assistant that can speak both Indonesian and English. Respond naturally and helpfully to: ${message}`,
-        max_tokens: 200,
-        temperature: 0.7,
-        stop_sequences: [],
+        prompt: `Kamu adalah SuperNova, asisten AI yang sangat pintar dan ramah. Kamu mahir berbahasa Indonesia dan Inggris. Selalu jawab dengan natural dan membantu. Jika user berbahasa Indonesia, jawab dalam bahasa Indonesia yang baik dan benar. Jika user berbahasa Inggris, jawab dalam bahasa Inggris.
+
+Pesan user: ${message}
+
+Jawaban SuperNova:`,
+        max_tokens: 250,
+        temperature: 0.8,
+        stop_sequences: ["User:", "Pesan user:"],
       }),
     });
 
